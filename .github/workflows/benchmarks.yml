@@ -251,7 +251,7 @@ jobs:
           ms_print dag.massif > dag_memory.txt
           
       - name: Upload memory profiles
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: memory-profiles
           path: |
@@ -390,7 +390,7 @@ jobs:
           EOF
           
       - name: Upload performance report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: performance-report
           path: PERFORMANCE_REPORT.md

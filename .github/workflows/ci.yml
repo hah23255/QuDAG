@@ -201,7 +201,7 @@ jobs:
           cp target/${{ matrix.target }}/release/qudag* artifacts/${{ matrix.artifact_name }} || true
           
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ matrix.target }}
           path: artifacts/*
@@ -253,7 +253,7 @@ jobs:
           node test-nodejs.mjs
           
       - name: Upload WASM artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wasm-packages
           path: |
@@ -361,7 +361,7 @@ jobs:
           
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: integration-logs
           path: qudag-testnet/integration_logs.txt

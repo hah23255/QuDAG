@@ -76,7 +76,7 @@ jobs:
         cp ../benchmark_baseline.json reports/baseline.json
     
     - name: Upload baseline artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: performance-baseline
         path: |
@@ -118,7 +118,7 @@ jobs:
         key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
     
     - name: Download baseline
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: performance-baseline
         path: .
@@ -168,7 +168,7 @@ jobs:
     
     - name: Upload comparison report
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: comparison-report-${{ matrix.benchmark_suite }}-${{ matrix.feature_flag }}
         path: |
@@ -219,7 +219,7 @@ jobs:
         fi
     
     - name: Upload memory profile
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: memory-profile
         path: benchmarking/memory_profile.png
@@ -244,7 +244,7 @@ jobs:
         pip install -r benchmarking/requirements.txt
     
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
     
@@ -273,7 +273,7 @@ jobs:
         python performance_analyzer.py --analyze ../artifacts/ --output optimization_report
     
     - name: Upload optimization report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: optimization-report
         path: |
@@ -327,7 +327,7 @@ jobs:
         pip install matplotlib pandas seaborn
     
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: artifacts
     
@@ -342,7 +342,7 @@ jobs:
         cat performance_report/summary.md >> ../performance_summary.md
     
     - name: Upload performance report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: comprehensive-performance-report
         path: |
