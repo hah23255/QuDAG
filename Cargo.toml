@@ -33,7 +33,7 @@ subtle = "2.5"
 zeroize = { version = "1.7", features = ["zeroize_derive"] }
 metrics = "0.21"
 parking_lot = "0.12"
-lru = "0.12"
+lru = "0.16"
 hex-literal = "0.4"
 async-trait = "0.1"
 toml = "0.8"
