@@ -1,0 +1,118 @@
+[workspace]
+
+[package]
+name = "qudag-bitchat"
+version = "0.1.0"
+edition = "2021"
+authors = ["QuDAG Team"]
+description = "Quantum-resistant secure chat for ESP32 with BitChat protocol"
+license = "MIT"
+repository = "https://github.com/ruvnet/QuDAG"
+keywords = ["esp32", "quantum", "chat", "embedded", "secure"]
+categories = ["embedded", "cryptography", "network-programming"]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "bitchat-esp32"
+path = "src/main.rs"
+required-features = ["esp32"]
+
+[[bin]]
+name = "bitchat-desktop"
+path = "src/desktop_main.rs"
+required-features = ["desktop"]
+
+[features]
+default = ["std"]
+std = ["alloc"]
+alloc = []
+
+# Target-specific features
+esp32 = ["esp32c6", "embedded", "wifi", "display"]
+esp32c3 = ["embedded", "wifi"]
+esp32c6 = ["embedded", "wifi", "wifi6"]
+desktop = ["std", "tokio", "crossterm", "rand"]
+
+# Hardware features
+embedded = ["dep:no-std-compat", "embedded-hal", "embedded-graphics"]
+wifi = []
+wifi6 = []
+display = ["st7789", "display-interface-spi"]
+bluetooth = []
+
+# Crypto features
+quantum-crypto = []
+lightweight-crypto = []
+
+# Testing
+qemu = []
+
+[dependencies]
+# Core dependencies (always needed)
+heapless = "0.8"
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+postcard = { version = "1.0", default-features = false }
+
+# Crypto dependencies
+sha2 = { version = "0.10", default-features = false }
+chacha20poly1305 = { version = "0.10", default-features = false, features = ["heapless"] }
+x25519-dalek = { version = "2.0", default-features = false, features = ["static_secrets"] }
+ed25519-dalek = { version = "2.0", default-features = false, features = ["hazmat"] }
+rand_core = { version = "0.6", default-features = false }
+zeroize = { version = "1.7", default-features = false, features = ["derive"] }
+
+# Embedded dependencies (conditional)
+embedded-hal = { version = "1.0", optional = true }
+embedded-graphics = { version = "0.8", optional = true }
+embedded-graphics-core = { version = "0.4", optional = true }
+st7789 = { version = "0.7", optional = true }
+display-interface-spi = { version = "0.5", optional = true }
+no-std-compat = { version = "0.4", optional = true, features = ["alloc"] }
+
+# Desktop dependencies (conditional)
+tokio = { version = "1.0", features = ["full"], optional = true }
+crossterm = { version = "0.27", optional = true }
+rand = { version = "0.8", optional = true }
+
+# ESP-IDF dependencies (for actual ESP32 builds)
+[target.'cfg(target_arch = "xtensa")'.dependencies]
+esp-idf-sys = { version = "0.34" }
+esp-idf-hal = { version = "0.43" }
+esp-idf-svc = { version = "0.48" }
+embedded-svc = { version = "0.27" }
+
+# ESP32-C6 RISC-V dependencies
+# Note: These are only used when building for the actual ESP32 target
+# For desktop testing, use --features "desktop,std"
+[target.'cfg(all(target_arch = "riscv32", target_os = "none"))'.dependencies]
+esp-hal = { version = "0.22", features = ["esp32c6"] }
+esp-backtrace = { version = "0.14", features = ["esp32c6", "panic-handler", "println"] }
+esp-println = { version = "0.12", features = ["esp32c6"] }
+esp-wifi = { version = "0.11", features = ["esp32c6", "wifi"] }
+esp-alloc = { version = "0.5" }
+
+[dev-dependencies]
+proptest = "1.4"
+criterion = "0.5"
+rand = "0.8"
+
+[[bench]]
+name = "crypto_bench"
+harness = false
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+debug = false
+panic = "abort"
+
+[profile.dev]
+opt-level = 1
+debug = true
+panic = "abort"
+
+[package.metadata.esp-idf-sys]
+esp_idf_version = "v5.2"
