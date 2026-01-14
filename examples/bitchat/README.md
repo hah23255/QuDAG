@@ -1,5 +1,7 @@
 # BitChat - Quantum-Resistant Secure Messaging for ESP32
 
+
+
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-ESP32--C6-blue" alt="ESP32-C6">
   <img src="https://img.shields.io/badge/Crypto-Quantum--Resistant-green" alt="Quantum-Resistant">
@@ -7,6 +9,18 @@
 </p>
 
 BitChat is a peer-to-peer, quantum-resistant secure messaging application designed for embedded devices, specifically targeting the ESP32-C6 with the Waveshare 1.47" LCD display.
+
+## Introduction
+
+BitChat is a secure peer to peer messaging system built for environments where infrastructure cannot be trusted, assumed, or even present. It is designed first for small embedded devices like the ESP32 C6, but its intent goes far beyond hobby hardware. BitChat treats secure communication as a primitive, not a service. Devices discover each other directly, establish trust locally, and exchange messages without accounts, servers, identifiers, or centralized control.
+
+At its most practical level, BitChat enables resilient local communication. Field teams, disaster response units, researchers, and industrial operators can exchange encrypted messages even when the internet is unavailable or intentionally disabled. Devices form ad hoc networks over WiFi, maintain forward secrecy, and minimize metadata by design. A lost device does not compromise past conversations. A compromised network does not reveal identities.
+
+Beyond this, BitChat becomes a building block. It can serve as a secure control plane for embedded systems, autonomous agents, and edge devices that need to coordinate without exposing intent or topology. Think sensor networks that negotiate state, vehicles that coordinate movement, or machines that exchange commands without ever touching the cloud.
+
+At the exotic end, BitChat hints at a future where communication is ambient and ephemeral. Devices that speak briefly, disappear, and leave no trace. Swarms that coordinate without leaders. Networks that exist only for the duration of a task. In this model, communication is no longer logged history but momentary agreement.
+
+BitChat is not just messaging. It is an experiment in how trust, privacy, and coordination can work when the network itself is hostile, temporary, or absent.
 
 ## Features
 
