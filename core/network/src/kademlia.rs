@@ -9,7 +9,7 @@ use crate::types::NetworkError;
 use libp2p::{
     kad::{
         BootstrapOk, Event as KademliaEvent, GetClosestPeersOk, GetProvidersOk, GetRecordOk,
-        PutRecordOk, QueryId, QueryResult, Record, RecordKey,
+        PeerInfo as KadPeerInfo, PutRecordOk, QueryId, QueryResult, Record, RecordKey,
     },
     PeerId as LibP2PPeerId,
 };
@@ -471,9 +471,10 @@ impl KademliaDHT {
             attempted_nodes: 0,
         };
 
-        let mut metrics = self.metrics.lock().unwrap();
-        metrics.bootstrap_attempts += 1;
-        drop(metrics);
+        {
+            let mut metrics = self.metrics.lock().unwrap();
+            metrics.bootstrap_attempts += 1;
+        }
 
         // Add bootstrap nodes
         let mut connected = 0;
@@ -517,9 +518,10 @@ impl KademliaDHT {
                     duration,
                 };
 
-                let mut metrics = self.metrics.lock().unwrap();
-                metrics.successful_bootstraps += 1;
-                drop(metrics);
+                {
+                    let mut metrics = self.metrics.lock().unwrap();
+                    metrics.successful_bootstraps += 1;
+                }
 
                 if let Some(tx) = &self.event_tx {
                     let _ = tx
@@ -585,12 +587,13 @@ impl KademliaDHT {
         drop(reputations);
 
         // Update metrics (TODO: re-enable when libp2p kad API is updated)
-        let mut metrics = self.metrics.lock().unwrap();
-        // metrics.routing_table_size = self.kademlia.kbuckets()
-        //     .map(|bucket| bucket.num_entries())
-        //     .sum();
-        metrics.routing_table_size = 0; // Placeholder
-        drop(metrics);
+        {
+            let mut metrics = self.metrics.lock().unwrap();
+            // metrics.routing_table_size = self.kademlia.kbuckets()
+            //     .map(|bucket| bucket.num_entries())
+            //     .sum();
+            metrics.routing_table_size = 0; // Placeholder
+        }
 
         // Send discovery event
         if let Some(tx) = &self.event_tx {
@@ -690,12 +693,13 @@ impl KademliaDHT {
     ) {
         debug!("Found {} providers in {:?}", providers.len(), duration);
 
-        let mut metrics = self.metrics.lock().unwrap();
-        metrics.successful_queries += 1;
-        metrics.avg_query_time = Duration::from_secs_f64(
-            (metrics.avg_query_time.as_secs_f64() + duration.as_secs_f64()) / 2.0,
-        );
-        drop(metrics);
+        {
+            let mut metrics = self.metrics.lock().unwrap();
+            metrics.successful_queries += 1;
+            metrics.avg_query_time = Duration::from_secs_f64(
+                (metrics.avg_query_time.as_secs_f64() + duration.as_secs_f64()) / 2.0,
+            );
+        }
 
         // Update peer reputations
         let mut reputations = self.peer_reputations.write().await;
@@ -753,17 +757,18 @@ impl KademliaDHT {
 
     /// Handle closest peers result
     async fn handle_closest_peers(&mut self, result: GetClosestPeersOk, duration: Duration) {
-        let peers = result.peers;
-        debug!("Found {} closest peers in {:?}", peers.len(), duration);
+        // In libp2p 0.55+ peers is Vec<PeerInfo>; extract peer IDs for existing logic
+        let peer_ids: Vec<LibP2PPeerId> = result.peers.into_iter().map(|p: KadPeerInfo| p.peer_id).collect();
+        debug!("Found {} closest peers in {:?}", peer_ids.len(), duration);
 
         // Update network size estimate
         {
             let mut metrics = self.metrics.lock().unwrap();
-            metrics.network_size_estimate = self.estimate_network_size(&peers);
+            metrics.network_size_estimate = self.estimate_network_size(&peer_ids);
         }
 
         // Check for network partitions
-        self.check_network_partition(&peers).await;
+        self.check_network_partition(&peer_ids).await;
     }
 
     /// Estimate network size based on closest peers

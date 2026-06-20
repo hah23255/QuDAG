@@ -1041,6 +1041,12 @@ pub enum CircuitState {
     Failed(String),
 }
 
+impl Default for CircuitManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CircuitManager {
     /// Create new circuit manager
     pub fn new() -> Self {
@@ -1135,11 +1141,12 @@ impl CircuitManager {
     /// Get an active circuit for use
     pub fn get_active_circuit(&mut self) -> Option<&mut Circuit> {
         // Find best active circuit based on quality score and age
+        // Use total_cmp to avoid panics when quality_score is NaN
         self.circuits
             .values_mut()
             .filter(|c| c.state == CircuitState::Active)
             .filter(|c| c.created_at.elapsed() < self.circuit_lifetime)
-            .max_by(|a, b| a.quality_score.partial_cmp(&b.quality_score).unwrap())
+            .max_by(|a, b| a.quality_score.total_cmp(&b.quality_score))
     }
 
     /// Update circuit metrics
@@ -1265,6 +1272,12 @@ pub struct NodeFlags {
     pub stable: bool,
 }
 
+impl Default for DirectoryClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DirectoryClient {
     /// Create new directory client
     pub fn new() -> Self {
@@ -1333,17 +1346,25 @@ impl DirectoryClient {
                 }
             }
 
-            // Select node weighted by bandwidth
+            // Select node weighted by bandwidth. If all nodes report zero
+            // bandwidth, fall back to uniform random selection to avoid a
+            // panic in gen_range(0..0).
             let total_bandwidth: u64 = available.iter().map(|n| n.bandwidth).sum();
-            let mut target = thread_rng().gen_range(0..total_bandwidth);
-
-            for (idx, node) in available.iter().enumerate() {
-                if target < node.bandwidth {
-                    selected.push(node.public_key.as_bytes().to_vec());
-                    available.remove(idx);
-                    break;
+            if total_bandwidth == 0 {
+                // Uniform fallback: pick a random index
+                let idx = thread_rng().gen_range(0..available.len());
+                selected.push(available[idx].public_key.as_bytes().to_vec());
+                available.remove(idx);
+            } else {
+                let mut target = thread_rng().gen_range(0..total_bandwidth);
+                for (idx, node) in available.iter().enumerate() {
+                    if target < node.bandwidth {
+                        selected.push(node.public_key.as_bytes().to_vec());
+                        available.remove(idx);
+                        break;
+                    }
+                    target -= node.bandwidth;
                 }
-                target -= node.bandwidth;
             }
         }
 
