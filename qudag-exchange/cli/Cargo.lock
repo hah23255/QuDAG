@@ -1477,7 +1477,7 @@ dependencies = [
 
 [[package]]
 name = "qudag-crypto"
-version = "0.3.1"
+version = "0.4.3"
 dependencies = [
  "aes-gcm",
  "argon2",
@@ -1506,7 +1506,7 @@ dependencies = [
 
 [[package]]
 name = "qudag-dag"
-version = "0.3.1"
+version = "0.4.3"
 dependencies = [
  "anyhow",
  "bincode",
@@ -1530,7 +1530,7 @@ dependencies = [
 
 [[package]]
 name = "qudag-exchange-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -1556,7 +1556,7 @@ dependencies = [
 
 [[package]]
 name = "qudag-exchange-core"
-version = "0.1.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1583,7 +1583,7 @@ dependencies = [
 
 [[package]]
 name = "qudag-vault-core"
-version = "0.2.1"
+version = "0.4.3"
 dependencies = [
  "aes-gcm",
  "argon2",
@@ -1881,9 +1881,9 @@ dependencies = [
 
 [[package]]
 name = "slab"
-version = "0.4.10"
+version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04dc19736151f35336d325007ac991178d504a119863a2fcb3758cdb5e52c50d"
+checksum = "7a2ae44ef20feb57a68b23d846850f861394c2e02dc425a50098ae8c90267589"
 
 [[package]]
 name = "sled"
